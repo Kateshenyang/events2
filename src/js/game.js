@@ -14,15 +14,15 @@ export default class Game {
     newField() {
         const field = this.field.getField(this.fieldSize);
         const body = document.querySelector('body');
-        let container = document.querySelector('.container'); 
+        let container = document.querySelector('.container');
         if (container) {
-            body.removeChild(container); 
+            container.remove();
         }
 
         container = document.createElement('div');
         container.classList.add('container');
-        container.appendChild(field);
-        body.insertBefore(container, body.firstChild);
+        container.append(field);
+        body.prepend(container);
         this.cells = [...field.children];
         this.cells.forEach(cell => cell.addEventListener('click', this.handleCellClick.bind(this)));
     }
@@ -45,29 +45,27 @@ export default class Game {
             this.randomPosition();
             return;
         }
-        this.deletedGoblin();
+        this.deleteGoblin();
         this.position = position;
         this.adventGoblin();
     }
 
-    deletedGoblin() {
+    deleteGoblin() {
         if (this.activeGoblin === null) {
             return;
         }
         this.cells[this.position].firstChild.remove();
         this.activeGoblin = null;
-        this.missed++;
-        this.checkGameOver();
     }
 
     adventGoblin() {
         this.activeGoblin = this.goblin.getGoblin();
-        this.cells[this.position].appendChild(this.activeGoblin);
+        this.cells[this.position].append(this.activeGoblin);
     }
 
     checkGameOver() {
         if (this.missed >= this.maxMissed) {
-            clearInterval(this.intervalId);
+            this.stop();
             alert(`Game Over! Your score is ${this.score}`);
         }
     }
@@ -80,7 +78,13 @@ export default class Game {
         this.intervalId = setInterval(gameLoop.bind(this), 1000);
     }
 
+    stop() {
+        clearInterval(this.intervalId);
+    }
+
     start() {
+        this.score = 0;
+        this.missed = 0;
         this.newField();
         this.play();
     }
