@@ -1,24 +1,24 @@
-image: Ubuntu1804  # образ для сборки
+version: 1.0.{build}
 
-stack: node 16  # окружение
+image: Visual Studio 2019
 
-branches:
-  only:
-    - master  # ветка git
+configuration: Release
 
-cache: node_modules  # кеширование
-
-install:
-  - npm install  # команда установки зависимостей
-
-build: off  # отключаем встроенную в appveyor систему сборки
+before_build:
+  - cmd: yarn install
+  - cmd: yarn lint
 
 build_script:
-  - npm run build   # команда сборки
+  - cmd: yarn build
 
-deploy_script:  # скрипт развёртывания
-  - git config --global credential.helper store
-  - git config --global user.name AppVeyor
-  - git config --global user.email ci@appveyor.com
-  - echo "https://$GITHUB_TOKEN:x-oauth-basic@github.com" > "$HOME/.git-credentials"
-  - npx push-dir --dir=dist --branch=gh-pages --force --verbose
+artifacts:
+  - path: dist
+    name: MyApp
+
+deploy:
+  provider: GitHub
+  auth_token:
+    secure: YOUR_GITHUB_TOKEN
+  tag: true
+  on:
+    branch: master
