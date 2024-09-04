@@ -1,24 +1,28 @@
-version: 1.0.{build}
+image: Ubuntu2204  # образ для сборки
 
-image: Visual Studio 2019
+stack: node 20  # окружение
 
-configuration: Release
+branches:
+  only:
+    - master  # ветка git
+    - main
 
-before_build:
-  - cmd: yarn install
-  - cmd: yarn lint
+cache: node_modules  # кеширование
+
+install:
+  - yarn  # команда установки зависимостей
+
+build: off  # отключаем встроенную в appveyor систему сборки
 
 build_script:
-  - cmd: yarn build
+  - yarn build   # команда сборки
 
-artifacts:
-  - path: dist
-    name: MyApp
+test_script:
+  - yarn lint && yarn test  # скрипт тестирования
 
-deploy:
-  provider: GitHub
-  auth_token:
-    secure: YOUR_GITHUB_TOKEN
-  tag: true
-  on:
-    branch: master
+deploy_script:  # скрипт развёртывания
+  - git config --global credential.helper store
+  - git config --global user.name AppVeyor
+  - git config --global user.email ci@appveyor.com
+  - echo "https://$GITHUB_TOKEN:x-oauth-basic@github.com" > "$HOME/.git-credentials"
+  - npx gh-pages -d dist -u "appveyor-bot <ci@appveyor>"
