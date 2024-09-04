@@ -14,10 +14,18 @@
   },
   "overrides": [
     {
+      "files": ["src/**/*.js", "src/**/*.jsx"],
+      "rules": {
+        "no-console": "warn"
+      }
+    },
+    {
       "files": ["**/*.test.js"],
       "plugins": ["jest"],
       "extends": ["plugin:jest/recommended"],
-      "rules": { "jest/prefer-expect-assertions": "off" }
+      "rules": {
+        "jest/prefer-expect-assertions": "off"
+      }
     }
   ]
 }
